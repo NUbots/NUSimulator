@@ -1,0 +1,2 @@
+/usr/bin/ar cq libnuclear_extension.a  CMakeFiles/nuclear_extension.dir/extension.cpp.o
+/usr/bin/ranlib libnuclear_extension.a

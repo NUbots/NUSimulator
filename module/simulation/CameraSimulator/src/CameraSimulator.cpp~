@@ -11,7 +11,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+asddas * You should have received a copy of the GNU General Public License
  * along with the NUbots Codebase.  If not, see <http://www.gnu.org/licenses/>.
  *
  * Copyright 2016 NUbots <nubots@nubots.net>
@@ -27,25 +27,8 @@ namespace simulation {
 
     CameraSimulator::CameraSimulator(std::unique_ptr<NUClear::Environment> environment)
     : Reactor(std::move(environment)) {
-
-        on<Always>().then([this] {
-            std::cout << "Hello\n";
-            sleep(1);
-        });
+	std::cout << "Hello\n";
+	sleep(1);
     }
 }
 }
-
-
-/*
-    CameraSimulator::CameraSimulator(std::unique_ptr<NUClear::Environment> environment)
-    : Reactor(std::move(environment)) {
-
-        on<Always,With<WorldState>>().then([this] (const WorldState& ws) {
-
-            ws.view()
-            std::cout << "Hello\n";
-            sleep(1);
-        });
-    }
-    */

@@ -1,0 +1,1 @@
+/usr/bin/c++     -std=c++14 -fPIC -g  -std=c++14 -fPIC   CMakeFiles/CameraSimulator.dir/CameraSimulator.cpp.o  -o ../../bin/CameraSimulator -rdynamic ../../bin/lib/libsimulationCameraSimulator.so ../utility/libnuclear_utility.a ../message/libnuclear_message.a ../extension/libnuclear_extension.a /usr/local/lib/libnuclear.a -Wl,-rpath,lib/:../lib/:bin/lib 

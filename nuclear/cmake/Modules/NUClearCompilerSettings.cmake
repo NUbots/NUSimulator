@@ -23,8 +23,8 @@ IF(NOT MSVC)
 	SET(NUCLEAR_ROLES_C_FLAGS   "${NUCLEAR_ROLES_C_FLAGS} -std=c++14")
 
 	# Build using -fPIC so the code can be shared libraries properly
-	SET(NUCLEAR_ROLES_CXX_FLAGS "${NUCLEAR_ROLES_CXX_FLAGS} -fPIC")
-	SET(NUCLEAR_ROLES_C_FLAGS   "${NUCLEAR_ROLES_C_FLAGS} -fPIC")
+	SET(NUCLEAR_ROLES_CXX_FLAGS "${NUCLEAR_ROLES_CXX_FLAGS} -fPIC -pthread")
+	SET(NUCLEAR_ROLES_C_FLAGS   "${NUCLEAR_ROLES_C_FLAGS} -fPIC -pthread")
 ENDIF()
 
 # Add these flags to the build types
