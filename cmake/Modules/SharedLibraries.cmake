@@ -1,0 +1,13 @@
+# Find our globally shared libraries:
+FIND_PACKAGE(Armadillo REQUIRED)
+
+# Some definitions for armadillo
+ADD_DEFINITIONS(-DARMA_DONT_USE_WRAPPER -DARMA_32BIT_WORD)
+
+message(ARMADILLO ${ARMADILLO_INCLUDE_DIR})
+# Set include directories and libraries:
+INCLUDE_DIRECTORIES(SYSTEM ${ARMADILLO_INCLUDE_DIR})
+
+SET(NUCLEAR_ADDITIONAL_SHARED_LIBRARIES
+    ${ARMADILLO_LIBRARIES}
+)

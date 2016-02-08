@@ -3,6 +3,66 @@
 	{
 		"selected_items":
 		[
+			[
+				"Sce",
+				"SceneNode"
+			],
+			[
+				"double",
+				"double_to_color"
+			],
+			[
+				"doub",
+				"double_to_color"
+			],
+			[
+				"image",
+				"image_yuyv"
+			],
+			[
+				"TEX",
+				"TEX_WIDTH"
+			],
+			[
+				"tex",
+				"tex_to_image"
+			],
+			[
+				"TEX_",
+				"TEX_WIDTH"
+			],
+			[
+				"time",
+				"time_tally"
+			],
+			[
+				"tim",
+				"timeSinceLastFrame"
+			],
+			[
+				"initi",
+				"initialise_scene"
+			],
+			[
+				"diff",
+				"difftime"
+			],
+			[
+				"this",
+				"this_time"
+			],
+			[
+				"render",
+				"render_target"
+			],
+			[
+				"ogre_",
+				"ogre_root"
+			],
+			[
+				"scen",
+				"scene_mgr"
+			]
 		]
 	},
 	"buffers":
@@ -16,12 +76,112 @@
 			}
 		},
 		{
-			"file": "roles/CameraSimulator.role",
+			"file": "module/simulation/CameraSimulator/CMakeLists.txt",
 			"settings":
 			{
-				"buffer_size": 44,
+				"buffer_size": 256,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "cmake/Modules/FindPkgMacros.cmake",
+			"settings":
+			{
+				"buffer_size": 5638,
 				"line_ending": "Unix",
-				"name": "NUCLEAR_ROLE("
+				"name": "#-------------------------------------------------"
+			}
+		},
+		{
+			"file": "cmake/Modules/PreprocessorUtils.cmake",
+			"settings":
+			{
+				"buffer_size": 1594,
+				"line_ending": "Unix",
+				"name": "#-------------------------------------------------"
+			}
+		},
+		{
+			"file": "module/simulation/CameraSimulator/src/CameraSimulator.cpp",
+			"settings":
+			{
+				"buffer_size": 17909,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "module/simulation/CameraSimulator/src/CameraSimulator (copy).cpp",
+			"settings":
+			{
+				"buffer_size": 5935,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "/*\n * This file is part of NUbots Codebase.\n *\n * The NUbots Codebase is free software: you can redistribute it and/or modify\n * it under the terms of the GNU General Public License as published by\n * the Free Software Foundation, either version 3 of the License, or\n * (at your option) any later version.\n *\n * The NUbots Codebase is distributed in the hope that it will be useful,\n * but WITHOUT ANY WARRANTY; without even the implied warranty of\n * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n * GNU General Public License for more details.\n *\n * You should have received a copy of the GNU General Public License\n * along with the NUbots Codebase.  If not, see <http://www.gnu.org/licenses/>.\n *\n * Copyright 2016 NUbots <nubots@nubots.net>\n */\n\n#ifndef MODULE_SIMULATOR_CAMERASIMULATOR_H\n#define MODULE_SIMULATOR_CAMERASIMULATOR_H\n\n#include <nuclear>\n#include <Overlay/OgreOverlay.h>\n#include <OgreEntity.h>\n#include <OgreCamera.h>\n#include <OgreLogManager.h>\n#include <OgreRoot.h>\n#include <OgreViewport.h>\n#include <OgreSceneManager.h>\n#include <OgreRenderWindow.h>\n#include <OgreConfigFile.h>\n#include <OgreMaterialManager.h>\n#include <OgreMaterial.h>\n#include <OgreTextureManager.h>\n#include <OgreWindowEventUtilities.h>\n#include <OgreCompositorInstance.h>\n#include <OgreCompositorLogic.h>\n#include <OgreHardwarePixelBuffer.h>\n\nnamespace module {\nnamespace simulation {\n\n    class CameraSimulator : public NUClear::Reactor {\n\n    	Ogre::Root* ogre_root;\n    	Ogre::Camera* camera;\n    	Ogre::SceneManager* scene_mgr;\n    	Ogre::RenderWindow* window;\n    	Ogre::RenderTexture* render_target;\n		Ogre::TexturePtr rtt_tex;\n\n    	int frame_num;\n\n        void initialise_ogre();\n\n    public:\n        /// @brief Called by the powerplant to build and setup the CameraSimulator reactor.\n        explicit CameraSimulator(std::unique_ptr<NUClear::Environment> environment);\n    };\n\n}\n}\n\n#endif  // MODULE_SIMULATOR_CAMERASIMULATOR_H\n",
+			"file": "module/simulation/CameraSimulator/src/CameraSimulator (copy).h",
+			"file_size": 1915,
+			"file_write_time": 130991261540041330,
+			"settings":
+			{
+				"buffer_size": 1948,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "*/\n\n#include \"BaseApplication.h\"\n\n//---------------------------------------------------------------------------\nBaseApplication::BaseApplication(void)\n    : mRoot(0),\n    mCamera(0),\n    mSceneMgr(0),\n    mWindow(0),\n//    mResourcesCfg(Ogre::BLANKSTRING),\n//    mPluginsCfg(Ogre::BLANKSTRING),\n    mTrayMgr(0),\n    mCameraMan(0),\n    mDetailsPanel(0),\n    mCursorWasVisible(false),\n    mShutDown(false),\n    mInputManager(0),\n    mMouse(0),\n    mKeyboard(0),\n    mOverlaySystem(0)\n{\n    m_ResourcePath = \"\";\n}\n\n//---------------------------------------------------------------------------\nBaseApplication::~BaseApplication(void)\n{\n    if (mTrayMgr) delete mTrayMgr;\n    if (mCameraMan) delete mCameraMan;\n    if (mOverlaySystem) delete mOverlaySystem;\n\n    // Remove ourself as a Window listener\n    Ogre::WindowEventUtilities::removeWindowEventListener(mWindow, this);\n    windowClosed(mWindow);\n    delete mRoot;\n}\n\n//---------------------------------------------------------------------------\nbool BaseApplication::configure(void)\n{\n	mRoot->restoreConfig();\n    // Show the configuration dialog and initialise the system.\n    // You can skip this and use root.restoreConfig() to load configuration\n    // settings if you were sure there are valid ones saved in ogre.cfg.\n    //if(mRoot->showConfigDialog())\n    {\n    mWindow = mRoot->initialise(true, \"NUbots Render Window\");\n        // If returned true, user clicked OK so initialise.\n        // Here we choose to let the system create a default rendering window by passing 'true'.\n\n        return true;\n    }\n//    else\n    {\n  //      return false;\n    }\n}\n//---------------------------------------------------------------------------\nvoid BaseApplication::chooseSceneManager(void)\n{\n    // Get the SceneManager, in this case a generic one\n    mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);\n\n    // Initialize the OverlaySystem (changed for Ogre 1.9)\n    mOverlaySystem = new Ogre::OverlaySystem();\n    //mSceneMgr->addRenderQueueListener(mOverlaySystem);\n}\n//---------------------------------------------------------------------------\nvoid BaseApplication::createCamera(void)\n{\n    // Create the camera\n    mCamera = mSceneMgr->createCamera(\"PlayerCam\");\n\n    // Position it at 500 in Z direction\n    mCamera->setPosition(Ogre::Vector3(0,0,180));\n    // Look back along -Z\n    mCamera->lookAt(Ogre::Vector3(0,0,-300));\n    mCamera->setNearClipDistance(5);\n\n    mCameraMan = new OgreBites::SdkCameraMan(mCamera);   // Create a default camera controller\n}\n//---------\n//---------------------------------------------------------------------------\nvoid BaseApplication::destroyScene(void)\n{\n}\n//---------------------------------------------------------------------------\nvoid BaseApplication::createViewports(void)\n{\n    // Create one viewport, entire window\n    Ogre::Viewport* vp = mWindow->addViewport(mCamera);\n    vp->setBackgroundColour(Ogre::ColourValue(0,0,0));\n\n    // Alter the camera aspect ratio to match the viewport\n    mCamera->setAspectRatio(Ogre::Real(vp->getActualWidth()) / Ogre::Real(vp->getActualHeight()));\n}\n//---------------------------------------------------------------------------\nvoid BaseApplication::setupResources(void)\n{\n    // Load resource paths from config file\n    Ogre::ConfigFile cf;\n    cf.load(mResourcesCfg);\n\n    // Go through all sections & settings in the file\n    Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();\n\n    Ogre::String secName, typeName, archName;\n    while (seci.hasMoreElements())\n    {\n        secName = seci.peekNextKey();\n        Ogre::ConfigFile::SettingsMultiMap *settings = seci.getNext();\n        Ogre::ConfigFile::SettingsMultiMap::iterator i;\n        for (i = settings->begin(); i != settings->end(); ++i)\n        {\n            typeName = i->first;\n            archName = i->second;\n\n#if OGRE_PLATFORM == OGRE_PLATFORM_APPLE\n            // OS X does not set the working directory relative to the app.\n            // In order to make things portable on OS X we need to provide\n            // the loading with it's own bundle path location.\n            if (!Ogre::StringUtil::startsWith(archName, \"/\", false)) // only adjust relative directories\n                archName = Ogre::String(Ogre::macBundlePath() + \"/\" + archName);\n#endif\n\n            Ogre::ResourceGroupManager::getSingleton().addResourceLocation(\n                archName, typeName, secName);\n        }\n    }\n}\n//---------------------------------------------------------------------------\nvoid BaseApplication::createResourceListener(void)\n{\n}\n//---------------------------------------------------------------------------\nvoid BaseApplication::loadResources(void)\n{\n    Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();\n}\n//---------------------------------------------------------------------------\nvoid BaseApplication::go(void)\n{\n#ifdef _DEBUG\n#ifndef OGRE_STATIC_LIB\n    mResourcesCfg = m_ResourcePath + \"resources_d.cfg\";\n    mPluginsCfg = m_ResourcePath + \"plugins_d.cfg\";\n#else\n    mResourcesCfg = \"resources_d.cfg\";\n    mPluginsCfg = \"plugins_d.cfg\";\n#endif\n#else\n#ifndef OGRE_STATIC_LIB\n    mResourcesCfg = m_ResourcePath + \"resources.cfg\";\n    mPluginsCfg = m_ResourcePath + \"plugins.cfg\";\n#else\n    mResourcesCfg = \"resources.cfg\";\n    mPluginsCfg = \"plugins.cfg\";\n#endif\n#endif\n\n    if (!setup())\n        return;\n\n    mRoot->startRendering();\n\n    // Clean up\n         destroyScene();\n}\n//---------------------------------------------------------------------------\nbool BaseApplication::setup(void)\n{\n    mRoot = new Ogre::Root(mPluginsCfg);\n\n    setupResources();\n\n    bool carryOn = configure();\n    if (!carryOn) return false;\n\n    chooseSceneManager();\n    createCamera();\n    createViewports();\n\n    // Set default mipmap level (NB some APIs ignore this)\n    Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);\n\n    // Load resources\n    loadResources();\n\n    // Create the scene\n    return true;\n};\n//---------------------------------------------------------------------------\nbool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)\n{\n    if(mWindow->isClosed())\n        return false;\n\n    if(mShutDown)\n        return false;\n\n    // Need to capture/update each device\n    mKeyboard->capture();\n    mMouse->capture();\n\n    mTrayMgr->frameRenderingQueued(evt);\n\n    if (!mTrayMgr->isDialogVisible())\n    {\n        mCameraMan->frameRenderingQueued(evt);   // If dialog isn't up, then update the camera\n        if (mDetailsPanel->isVisible())          // If details panel is visible, then update its contents\n        {\n            mDetailsPanel->setParamValue(0, Ogre::StringConverter::toString(mCamera->getDerivedPosition().x));\n            mDetailsPanel->setParamValue(1, Ogre::StringConverter::toString(mCamera->getDerivedPosition().y));\n            mDetailsPanel->setParamValue(2, Ogre::StringConverter::toString(mCamera->getDerivedPosition().z));\n            mDetailsPanel->setParamValue(4, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().w));\n            mDetailsPanel->setParamValue(5, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().x));\n            mDetailsPanel->setParamValue(6, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().y));\n            mDetailsPanel->setParamValue(7, Ogre::StringConverter::toString(mCamera->getDerivedOrientation().z));\n        }\n    }\n\n    return true;\n}\n    else if (arg.key == OIS::KC_SYSRQ)   // take a screenshot\n    {\n        mWindow->writeContentsToTimestampedFile(\"screenshot\", \".jpg\");\n    }\n    else if (arg.key == OIS::KC_ESCAPE)\n    {\n        mShutDown = true;\n    }\n\n///    mCameraMan->injectKeyDown(arg);\n    return true;\n}\n//---------------------------------------------------------------------------\n",
+			"file": "module/simulation/CameraSimulator/src/BaseApplication.cpp",
+			"file_size": 14813,
+			"file_write_time": 130990362767848540,
+			"settings":
+			{
+				"buffer_size": 7781,
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"contents": "Searching 227 files for \"-fPIC\" (case sensitive)\n\n/home/steve/NUSimulator/build.ninja:\n   61  build nuclear/utility/CMakeFiles/nuclear_utility.dir/utility.cpp.o: CXX_COMPILER nuclear/utility/utility.cpp\n   62    DEP_FILE = nuclear/utility/CMakeFiles/nuclear_utility.dir/utility.cpp.o.d\n   63:   FLAGS = -std=c++14 -fPIC -g  -std=c++14 -fPIC -I/usr/local/include -Ishared\n   64    OBJECT_DIR = nuclear/utility/CMakeFiles/nuclear_utility.dir\n   65    OBJECT_FILE_DIR = nuclear/utility/CMakeFiles/nuclear_utility.dir\n   ..\n   73  \n   74  build nuclear/utility/libnuclear_utility.a: CXX_STATIC_LIBRARY_LINKER nuclear/utility/CMakeFiles/nuclear_utility.dir/utility.cpp.o\n   75:   LANGUAGE_COMPILE_FLAGS = -std=c++14 -fPIC -g  -std=c++14 -fPIC\n   76    POST_BUILD = :\n   77    PRE_LINK = :\n   ..\n   88  build nuclear/extension/CMakeFiles/nuclear_extension.dir/extension.cpp.o: CXX_COMPILER nuclear/extension/extension.cpp\n   89    DEP_FILE = nuclear/extension/CMakeFiles/nuclear_extension.dir/extension.cpp.o.d\n   90:   FLAGS = -std=c++14 -fPIC -g  -std=c++14 -fPIC -I/usr/local/include -Ishared\n   91    OBJECT_DIR = nuclear/extension/CMakeFiles/nuclear_extension.dir\n   92    OBJECT_FILE_DIR = nuclear/extension/CMakeFiles/nuclear_extension.dir\n   ..\n  100  \n  101  build nuclear/extension/libnuclear_extension.a: CXX_STATIC_LIBRARY_LINKER nuclear/extension/CMakeFiles/nuclear_extension.dir/extension.cpp.o\n  102:   LANGUAGE_COMPILE_FLAGS = -std=c++14 -fPIC -g  -std=c++14 -fPIC\n  103    POST_BUILD = :\n  104    PRE_LINK = :\n  ...\n  115  build nuclear/message/CMakeFiles/nuclear_message.dir/message.cpp.o: CXX_COMPILER nuclear/message/message.cpp\n  116    DEP_FILE = nuclear/message/CMakeFiles/nuclear_message.dir/message.cpp.o.d\n  117:   FLAGS = -std=c++14 -fPIC -g  -std=c++14 -fPIC -I/usr/local/include -Ishared\n  118    OBJECT_DIR = nuclear/message/CMakeFiles/nuclear_message.dir\n  119    OBJECT_FILE_DIR = nuclear/message/CMakeFiles/nuclear_message.dir\n  ...\n  127  \n  128  build nuclear/message/libnuclear_message.a: CXX_STATIC_LIBRARY_LINKER nuclear/message/CMakeFiles/nuclear_message.dir/message.cpp.o\n  129:   LANGUAGE_COMPILE_FLAGS = -std=c++14 -fPIC -g  -std=c++14 -fPIC\n  130    POST_BUILD = :\n  131    PRE_LINK = :\n  ...\n  147  build nuclear/roles/CMakeFiles/CameraSimulator.dir/CameraSimulator.cpp.o: CXX_COMPILER nuclear/roles/CameraSimulator.cpp || cmake_order_depends_target_CameraSimulator\n  148    DEP_FILE = nuclear/roles/CMakeFiles/CameraSimulator.dir/CameraSimulator.cpp.o.d\n  149:   FLAGS = -std=c++14 -fPIC -g  -std=c++14 -fPIC -I/usr/local/include -Ishared -Imodule/simulation/CameraSimulator/src -Inuclear/module/simulation/CameraSimulator/src\n  150    OBJECT_DIR = nuclear/roles/CMakeFiles/CameraSimulator.dir\n  151    OBJECT_FILE_DIR = nuclear/roles/CMakeFiles/CameraSimulator.dir\n  ...\n  159  \n  160  build bin/CameraSimulator: CXX_EXECUTABLE_LINKER nuclear/roles/CMakeFiles/CameraSimulator.dir/CameraSimulator.cpp.o | bin/lib/libsimulationCameraSimulator.so nuclear/utility/libnuclear_utility.a nuclear/message/libnuclear_message.a nuclear/extension/libnuclear_extension.a /usr/local/lib/libnuclear.a || nuclear/extension/libnuclear_extension.a nuclear/utility/libnuclear_utility.a nuclear/message/libnuclear_message.a bin/lib/libsimulationCameraSimulator.so\n  161:   FLAGS = -std=c++14 -fPIC -g  -std=c++14 -fPIC\n  162    LINK_LIBRARIES = -rdynamic bin/lib/libsimulationCameraSimulator.so nuclear/utility/libnuclear_utility.a nuclear/message/libnuclear_message.a nuclear/extension/libnuclear_extension.a /usr/local/lib/libnuclear.a -Wl,-rpath,lib/:../lib/:bin/lib\n  163    POST_BUILD = :\n  ...\n  193    DEFINES = -DsimulationCameraSimulator_EXPORTS\n  194    DEP_FILE = nuclear/module/simulation/CameraSimulator/CMakeFiles/simulationCameraSimulator.dir/src/CameraSimulator.cpp.o.d\n  195:   FLAGS = -std=c++14 -fPIC -g  -std=c++14 -fPIC -fPIC -I/usr/local/include -Imodule/simulation/CameraSimulator/src -Inuclear/module/simulation/CameraSimulator/src -Ishared\n  196    OBJECT_DIR = nuclear/module/simulation/CameraSimulator/CMakeFiles/simulationCameraSimulator.dir\n  197    OBJECT_FILE_DIR = nuclear/module/simulation/CameraSimulator/CMakeFiles/simulationCameraSimulator.dir/src\n  ...\n  205  \n  206  build bin/lib/libsimulationCameraSimulator.so: CXX_SHARED_LIBRARY_LINKER nuclear/module/simulation/CameraSimulator/CMakeFiles/simulationCameraSimulator.dir/src/CameraSimulator.cpp.o | nuclear/utility/libnuclear_utility.a nuclear/message/libnuclear_message.a nuclear/extension/libnuclear_extension.a /usr/local/lib/libnuclear.a || nuclear/extension/libnuclear_extension.a nuclear/utility/libnuclear_utility.a nuclear/message/libnuclear_message.a\n  207:   LANGUAGE_COMPILE_FLAGS = -std=c++14 -fPIC -g  -std=c++14 -fPIC\n  208    LINK_LIBRARIES = nuclear/utility/libnuclear_utility.a nuclear/message/libnuclear_message.a nuclear/extension/libnuclear_extension.a /usr/local/lib/libnuclear.a -Wl,-rpath,lib/:../lib/:bin/lib\n  209    POST_BUILD = :\n\n/home/steve/NUSimulator/rules.ninja:\n   75  \n   76  rule CXX_SHARED_LIBRARY_LINKER\n   77:   command = $PRE_LINK && /usr/bin/c++  -fPIC $LANGUAGE_COMPILE_FLAGS $ARCH_FLAGS $LINK_FLAGS -shared $SONAME_FLAG$SONAME -o $TARGET_FILE $in $LINK_PATH $LINK_LIBRARIES && $POST_BUILD\n   78    description = Linking CXX shared library $TARGET_FILE\n   79    restat = $RESTAT\n   ..\n   84  \n   85  rule CXX_SHARED_LIBRARY_LINKER_RSP_FILE\n   86:   command = $PRE_LINK && /usr/bin/c++  -fPIC $LANGUAGE_COMPILE_FLAGS $ARCH_FLAGS $LINK_FLAGS -shared $SONAME_FLAG$SONAME -o $TARGET_FILE @$RSP_FILE  && $POST_BUILD\n   87    description = Linking CXX shared library $TARGET_FILE\n   88    rspfile = $RSP_FILE\n\n/home/steve/NUSimulator/build/build.ninja:\n   61  build nuclear/utility/CMakeFiles/nuclear_utility.dir/utility.cpp.o: CXX_COMPILER ../nuclear/utility/utility.cpp\n   62    DEP_FILE = nuclear/utility/CMakeFiles/nuclear_utility.dir/utility.cpp.o.d\n   63:   FLAGS = -std=c++14 -fPIC -g  -std=c++14 -fPIC -I/usr/local/include -I../shared -Ishared\n   64    OBJECT_DIR = nuclear/utility/CMakeFiles/nuclear_utility.dir\n   65    OBJECT_FILE_DIR = nuclear/utility/CMakeFiles/nuclear_utility.dir\n   ..\n   73  \n   74  build nuclear/utility/libnuclear_utility.a: CXX_STATIC_LIBRARY_LINKER nuclear/utility/CMakeFiles/nuclear_utility.dir/utility.cpp.o\n   75:   LANGUAGE_COMPILE_FLAGS = -std=c++14 -fPIC -g  -std=c++14 -fPIC\n   76    POST_BUILD = :\n   77    PRE_LINK = :\n   ..\n   88  build nuclear/extension/CMakeFiles/nuclear_extension.dir/extension.cpp.o: CXX_COMPILER ../nuclear/extension/extension.cpp\n   89    DEP_FILE = nuclear/extension/CMakeFiles/nuclear_extension.dir/extension.cpp.o.d\n   90:   FLAGS = -std=c++14 -fPIC -g  -std=c++14 -fPIC -I/usr/local/include -I../shared -Ishared\n   91    OBJECT_DIR = nuclear/extension/CMakeFiles/nuclear_extension.dir\n   92    OBJECT_FILE_DIR = nuclear/extension/CMakeFiles/nuclear_extension.dir\n   ..\n  100  \n  101  build nuclear/extension/libnuclear_extension.a: CXX_STATIC_LIBRARY_LINKER nuclear/extension/CMakeFiles/nuclear_extension.dir/extension.cpp.o\n  102:   LANGUAGE_COMPILE_FLAGS = -std=c++14 -fPIC -g  -std=c++14 -fPIC\n  103    POST_BUILD = :\n  104    PRE_LINK = :\n  ...\n  115  build nuclear/message/CMakeFiles/nuclear_message.dir/message.cpp.o: CXX_COMPILER ../nuclear/message/message.cpp\n  116    DEP_FILE = nuclear/message/CMakeFiles/nuclear_message.dir/message.cpp.o.d\n  117:   FLAGS = -std=c++14 -fPIC -g  -std=c++14 -fPIC -I/usr/local/include -I../shared -Ishared\n  118    OBJECT_DIR = nuclear/message/CMakeFiles/nuclear_message.dir\n  119    OBJECT_FILE_DIR = nuclear/message/CMakeFiles/nuclear_message.dir\n  ...\n  127  \n  128  build nuclear/message/libnuclear_message.a: CXX_STATIC_LIBRARY_LINKER nuclear/message/CMakeFiles/nuclear_message.dir/message.cpp.o\n  129:   LANGUAGE_COMPILE_FLAGS = -std=c++14 -fPIC -g  -std=c++14 -fPIC\n  130    POST_BUILD = :\n  131    PRE_LINK = :\n  ...\n  147  build nuclear/roles/CMakeFiles/CameraSimulator.dir/CameraSimulator.cpp.o: CXX_COMPILER nuclear/roles/CameraSimulator.cpp || cmake_order_depends_target_CameraSimulator\n  148    DEP_FILE = nuclear/roles/CMakeFiles/CameraSimulator.dir/CameraSimulator.cpp.o.d\n  149:   FLAGS = -std=c++14 -fPIC -g  -std=c++14 -fPIC -I/usr/local/include -I../shared -Ishared -I../module/simulation/CameraSimulator/src -Inuclear/module/simulation/CameraSimulator/src\n  150    OBJECT_DIR = nuclear/roles/CMakeFiles/CameraSimulator.dir\n  151    OBJECT_FILE_DIR = nuclear/roles/CMakeFiles/CameraSimulator.dir\n  ...\n  159  \n  160  build bin/CameraSimulator: CXX_EXECUTABLE_LINKER nuclear/roles/CMakeFiles/CameraSimulator.dir/CameraSimulator.cpp.o | bin/lib/libsimulationCameraSimulator.so nuclear/utility/libnuclear_utility.a nuclear/message/libnuclear_message.a nuclear/extension/libnuclear_extension.a /usr/local/lib/libnuclear.a || nuclear/extension/libnuclear_extension.a nuclear/utility/libnuclear_utility.a nuclear/message/libnuclear_message.a bin/lib/libsimulationCameraSimulator.so\n  161:   FLAGS = -std=c++14 -fPIC -g  -std=c++14 -fPIC\n  162    LINK_FLAGS = -pthread\n  163    LINK_LIBRARIES = -rdynamic bin/lib/libsimulationCameraSimulator.so nuclear/utility/libnuclear_utility.a nuclear/message/libnuclear_message.a nuclear/extension/libnuclear_extension.a /usr/local/lib/libnuclear.a -Wl,-rpath,lib/:../lib/:bin/lib\n  ...\n  194    DEFINES = -DsimulationCameraSimulator_EXPORTS\n  195    DEP_FILE = nuclear/module/simulation/CameraSimulator/CMakeFiles/simulationCameraSimulator.dir/src/CameraSimulator.cpp.o.d\n  196:   FLAGS = -std=c++14 -fPIC -g  -std=c++14 -fPIC -fPIC -I/usr/local/include -I../module/simulation/CameraSimulator/src -Inuclear/module/simulation/CameraSimulator/src -I../shared -Ishared\n  197    OBJECT_DIR = nuclear/module/simulation/CameraSimulator/CMakeFiles/simulationCameraSimulator.dir\n  198    OBJECT_FILE_DIR = nuclear/module/simulation/CameraSimulator/CMakeFiles/simulationCameraSimulator.dir/src\n  ...\n  206  \n  207  build bin/lib/libsimulationCameraSimulator.so: CXX_SHARED_LIBRARY_LINKER nuclear/module/simulation/CameraSimulator/CMakeFiles/simulationCameraSimulator.dir/src/CameraSimulator.cpp.o | nuclear/utility/libnuclear_utility.a nuclear/message/libnuclear_message.a nuclear/extension/libnuclear_extension.a /usr/local/lib/libnuclear.a || nuclear/extension/libnuclear_extension.a nuclear/utility/libnuclear_utility.a nuclear/message/libnuclear_message.a\n  208:   LANGUAGE_COMPILE_FLAGS = -std=c++14 -fPIC -g  -std=c++14 -fPIC\n  209    LINK_LIBRARIES = nuclear/utility/libnuclear_utility.a nuclear/message/libnuclear_message.a nuclear/extension/libnuclear_extension.a /usr/local/lib/libnuclear.a -Wl,-rpath,lib/:../lib/:bin/lib\n  210    POST_BUILD = :\n\n/home/steve/NUSimulator/build/rules.ninja:\n   75  \n   76  rule CXX_SHARED_LIBRARY_LINKER\n   77:   command = $PRE_LINK && /usr/bin/c++  -fPIC $LANGUAGE_COMPILE_FLAGS $ARCH_FLAGS $LINK_FLAGS -shared $SONAME_FLAG$SONAME -o $TARGET_FILE $in $LINK_PATH $LINK_LIBRARIES && $POST_BUILD\n   78    description = Linking CXX shared library $TARGET_FILE\n   79    restat = $RESTAT\n   ..\n   84  \n   85  rule CXX_SHARED_LIBRARY_LINKER_RSP_FILE\n   86:   command = $PRE_LINK && /usr/bin/c++  -fPIC $LANGUAGE_COMPILE_FLAGS $ARCH_FLAGS $LINK_FLAGS -shared $SONAME_FLAG$SONAME -o $TARGET_FILE @$RSP_FILE  && $POST_BUILD\n   87    description = Linking CXX shared library $TARGET_FILE\n   88    rspfile = $RSP_FILE\n\n~/NUSimulator/build/bin/CameraSimulator:\n    <binary>\n\n/home/steve/NUSimulator/build/nuclear/extension/CMakeFiles/nuclear_extension.dir/flags.make:\n    3  \n    4  # compile CXX with /usr/bin/c++\n    5: CXX_FLAGS =   -std=c++14 -fPIC -g  -std=c++14 -fPIC -I/usr/local/include -I/home/steve/NUSimulator/shared -I/home/steve/NUSimulator/build/shared   \n    6  \n    7  CXX_DEFINES = \n\n/home/steve/NUSimulator/build/nuclear/message/CMakeFiles/nuclear_message.dir/flags.make:\n    3  \n    4  # compile CXX with /usr/bin/c++\n    5: CXX_FLAGS =   -std=c++14 -fPIC -g  -std=c++14 -fPIC -I/usr/local/include -I/home/steve/NUSimulator/shared -I/home/steve/NUSimulator/build/shared   \n    6  \n    7  CXX_DEFINES = \n\n/home/steve/NUSimulator/build/nuclear/module/simulation/CameraSimulator/CMakeFiles/simulationCameraSimulator.dir/flags.make:\n    3  \n    4  # compile CXX with /usr/bin/c++\n    5: CXX_FLAGS =   -std=c++14 -fPIC -g  -std=c++14 -fPIC -fPIC -I/usr/local/include -I/home/steve/NUSimulator/module/simulation/CameraSimulator/src -I/home/steve/NUSimulator/build/nuclear/module/simulation/CameraSimulator/src -I/home/steve/NUSimulator/shared -I/home/steve/NUSimulator/build/shared   \n    6  \n    7  CXX_DEFINES = -DsimulationCameraSimulator_EXPORTS\n\n/home/steve/NUSimulator/build/nuclear/module/simulation/CameraSimulator/CMakeFiles/simulationCameraSimulator.dir/link.txt:\n    1: /usr/bin/c++  -fPIC   -std=c++14 -fPIC -g  -std=c++14 -fPIC  -shared -Wl,-soname,libsimulationCameraSimulator.so -o ../../../../bin/lib/libsimulationCameraSimulator.so CMakeFiles/simulationCameraSimulator.dir/src/CameraSimulator.cpp.o ../../../utility/libnuclear_utility.a ../../../message/libnuclear_message.a ../../../extension/libnuclear_extension.a /usr/local/lib/libnuclear.a -Wl,-rpath,lib/:../lib/:bin/lib \n    2  \n\n/home/steve/NUSimulator/build/nuclear/roles/CMakeFiles/CameraSimulator.dir/flags.make:\n    3  \n    4  # compile CXX with /usr/bin/c++\n    5: CXX_FLAGS =   -std=c++14 -fPIC -g  -std=c++14 -fPIC -I/usr/local/include -I/home/steve/NUSimulator/shared -I/home/steve/NUSimulator/build/shared -I/home/steve/NUSimulator/module/simulation/CameraSimulator/src -I/home/steve/NUSimulator/build/nuclear/module/simulation/CameraSimulator/src   \n    6  \n    7  CXX_DEFINES = \n\n/home/steve/NUSimulator/build/nuclear/roles/CMakeFiles/CameraSimulator.dir/link.txt:\n    1: /usr/bin/c++     -std=c++14 -fPIC -g  -std=c++14 -fPIC   CMakeFiles/CameraSimulator.dir/CameraSimulator.cpp.o  -o ../../bin/CameraSimulator -rdynamic ../../bin/lib/libsimulationCameraSimulator.so ../utility/libnuclear_utility.a ../message/libnuclear_message.a ../extension/libnuclear_extension.a /usr/local/lib/libnuclear.a -Wl,-rpath,lib/:../lib/:bin/lib \n    2  \n\n/home/steve/NUSimulator/build/nuclear/utility/CMakeFiles/nuclear_utility.dir/flags.make:\n    3  \n    4  # compile CXX with /usr/bin/c++\n    5: CXX_FLAGS =   -std=c++14 -fPIC -g  -std=c++14 -fPIC -I/usr/local/include -I/home/steve/NUSimulator/shared -I/home/steve/NUSimulator/build/shared   \n    6  \n    7  CXX_DEFINES = \n\n/home/steve/NUSimulator/nuclear/cmake/Modules/NUClearCompilerSettings.cmake:\n   23  	SET(NUCLEAR_ROLES_C_FLAGS   \"${NUCLEAR_ROLES_C_FLAGS} -std=c++14\")\n   24  \n   25: 	# Build using -fPIC so the code can be shared libraries properly\n   26: 	SET(NUCLEAR_ROLES_CXX_FLAGS \"${NUCLEAR_ROLES_CXX_FLAGS} -fPIC\")\n   27: 	SET(NUCLEAR_ROLES_C_FLAGS   \"${NUCLEAR_ROLES_C_FLAGS} -fPIC\")\n   28  ENDIF()\n   29  \n\n/home/steve/NUSimulator/nuclear/extension/CMakeFiles/nuclear_extension.dir/flags.make:\n    3  \n    4  # compile CXX with /usr/bin/c++\n    5: CXX_FLAGS =   -std=c++14 -fPIC -g  -std=c++14 -fPIC -I/usr/local/include -I/home/steve/NUSimulator/shared   \n    6  \n    7  CXX_DEFINES = \n\n/home/steve/NUSimulator/nuclear/message/CMakeFiles/nuclear_message.dir/flags.make:\n    3  \n    4  # compile CXX with /usr/bin/c++\n    5: CXX_FLAGS =   -std=c++14 -fPIC -g  -std=c++14 -fPIC -I/usr/local/include -I/home/steve/NUSimulator/shared   \n    6  \n    7  CXX_DEFINES = \n\n/home/steve/NUSimulator/nuclear/module/simulation/CameraSimulator/CMakeFiles/simulationCameraSimulator.dir/flags.make:\n    3  \n    4  # compile CXX with /usr/bin/c++\n    5: CXX_FLAGS =   -std=c++14 -fPIC -g  -std=c++14 -fPIC -fPIC -I/usr/local/include -I/home/steve/NUSimulator/module/simulation/CameraSimulator/src -I/home/steve/NUSimulator/nuclear/module/simulation/CameraSimulator/src -I/home/steve/NUSimulator/shared   \n    6  \n    7  CXX_DEFINES = -DsimulationCameraSimulator_EXPORTS\n\n/home/steve/NUSimulator/nuclear/module/simulation/CameraSimulator/CMakeFiles/simulationCameraSimulator.dir/link.txt:\n    1: /usr/bin/c++  -fPIC   -std=c++14 -fPIC -g  -std=c++14 -fPIC  -shared -Wl,-soname,libsimulationCameraSimulator.so -o ../../../../bin/lib/libsimulationCameraSimulator.so CMakeFiles/simulationCameraSimulator.dir/src/CameraSimulator.cpp.o ../../../utility/libnuclear_utility.a ../../../message/libnuclear_message.a ../../../extension/libnuclear_extension.a /usr/local/lib/libnuclear.a -Wl,-rpath,lib/:../lib/:bin/lib \n    2  \n\n/home/steve/NUSimulator/nuclear/roles/CMakeFiles/CameraSimulator.dir/flags.make:\n    3  \n    4  # compile CXX with /usr/bin/c++\n    5: CXX_FLAGS =   -std=c++14 -fPIC -g  -std=c++14 -fPIC -I/usr/local/include -I/home/steve/NUSimulator/shared -I/home/steve/NUSimulator/module/simulation/CameraSimulator/src -I/home/steve/NUSimulator/nuclear/module/simulation/CameraSimulator/src   \n    6  \n    7  CXX_DEFINES = \n\n/home/steve/NUSimulator/nuclear/roles/CMakeFiles/CameraSimulator.dir/link.txt:\n    1: /usr/bin/c++     -std=c++14 -fPIC -g  -std=c++14 -fPIC   CMakeFiles/CameraSimulator.dir/CameraSimulator.cpp.o  -o ../../bin/CameraSimulator -rdynamic ../../bin/lib/libsimulationCameraSimulator.so ../utility/libnuclear_utility.a ../message/libnuclear_message.a ../extension/libnuclear_extension.a /usr/local/lib/libnuclear.a -Wl,-rpath,lib/:../lib/:bin/lib \n    2  \n\n/home/steve/NUSimulator/nuclear/utility/CMakeFiles/nuclear_utility.dir/flags.make:\n    3  \n    4  # compile CXX with /usr/bin/c++\n    5: CXX_FLAGS =   -std=c++14 -fPIC -g  -std=c++14 -fPIC -I/usr/local/include -I/home/steve/NUSimulator/shared   \n    6  \n    7  CXX_DEFINES = \n\n82 matches across 20 files\n",
+			"settings":
+			{
+				"buffer_size": 17556,
+				"line_ending": "Unix",
+				"name": "Find Results",
+				"scratch": true
+			}
+		},
+		{
+			"file": "nuclear/cmake/Modules/NUClearCompilerSettings.cmake",
+			"settings":
+			{
+				"buffer_size": 1776,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "module/simulation/CameraSimulator/src/CameraSimulator.h",
+			"settings":
+			{
+				"buffer_size": 2703,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "module/simulation/CameraSimulator/src/CameraSimulator.cpp~",
+			"settings":
+			{
+				"buffer_size": 1065,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"contents": "/*\n-----------------------------------------------------------------------------\nFilename:    BaseApplication.h\n-----------------------------------------------------------------------------\n\nThis source file is part of the\n   ___                 __    __ _ _    _\n  /___\\__ _ _ __ ___  / / /\\ \\ (_) | _(_)\n //  // _` | '__/ _ \\ \\ \\/  \\/ / | |/ / |\n/ \\_// (_| | | |  __/  \\  /\\  /| |   <| |\n\\___/ \\__, |_|  \\___|   \\/  \\/ |_|_|\\_\\_|\n      |___/\nTutorial Framework (for Ogre 1.10)\nhttp://www.ogre3d.org/wiki/\n-----------------------------------------------------------------------------\n*/\n\n#ifndef __BaseApplication_h_\n#define __BaseApplication_h_\n\n#include <Overlay/OgreOverlay.h>\n#include <OgreEntity.h>\n#include <OgreCamera.h>\n#include <OgreLogManager.h>\n#include <OgreRoot.h>\n#include <OgreViewport.h>\n#include <OgreSceneManager.h>\n#include <OgreRenderWindow.h>\n#include <OgreConfigFile.h>\n#include <OgreMaterialManager.h>\n#include <OgreMaterial.h>\n#include <OgreTextureManager.h>\n#include <OgreWindowEventUtilities.h>\n#include <OgreCompositorInstance.h>\n#include <OgreCompositorLogic.h>\n#include <OgreHardwarePixelBuffer.h>\n\n#include <OISEvents.h>\n#include <OISInputManager.h>\n#include <OISKeyboard.h>\n#include <OISMouse.h>\n\n#include <SdkTrays.h>\n#include <SdkCameraMan.h>\n\nclass BaseApplication \n{\n\npublic:\n    BaseApplication(void);\n    virtual ~BaseApplication(void);\n\n    virtual void go(void);\n\nprotected:\n    virtual bool setup();\n    virtual bool configure(void);\n    virtual void chooseSceneManager(void);\n    virtual void createCamera(void);\n    virtual void createFrameListener(void);\n    virtual void createScene(void) = 0; // Override me!\n    virtual void destroyScene(void);\n    virtual void createViewports(void);\n    virtual void setupResources(void);\n    virtual void createResourceListener(void);\n    virtual void loadResources(void);\n    virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);\n\n    virtual bool keyPressed(const OIS::KeyEvent &arg);\n    virtual bool keyReleased(const OIS::KeyEvent &arg);\n    virtual bool mouseMoved(const OIS::MouseEvent &arg);\n    virtual bool mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id);\n    virtual bool mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id);\n\n    // Adjust mouse clipping area\n    virtual void windowResized(Ogre::RenderWindow* rw);\n    // Unattach OIS before window shutdown (very important under Linux)\n    virtual void windowClosed(Ogre::RenderWindow* rw);\n\n    Ogre::Root*                 mRoot;\n    Ogre::Camera*               mCamera;\n    Ogre::SceneManager*         mSceneMgr;\n    Ogre::RenderWindow*         mWindow;\n    Ogre::String                mResourcesCfg;\n    Ogre::String                mPluginsCfg;\n\n    Ogre::OverlaySystem*        mOverlaySystem;\n\n    // OgreBites\n    OgreBites::InputContext     mInputContext;\n    OgreBites::SdkTrayManager*	mTrayMgr;\n    OgreBites::SdkCameraMan*    mCameraMan;     	// Basic camera controller\n    OgreBites::ParamsPanel*     mDetailsPanel;   	// Sample details panel\n    bool                        mCursorWasVisible;	// Was cursor visible before dialog appeared?\n    bool                        mShutDown;\n\n    //OIS Input devices\n    OIS::InputManager*          mInputManager;\n    OIS::Mouse*                 mMouse;\n    OIS::Keyboard*              mKeyboard;\n\n    // Added for Mac compatibility\n    Ogre::String                 m_ResourcePath;\n\n#ifdef OGRE_STATIC_LIB\n    Ogre::StaticPluginLoader m_StaticPluginLoader;\n#endif\n};\n\n//---------------------------------------------------------------------------\n\n#endif // #ifndef __BaseApplication_h_\n\n//---------------------------------------------------------------------------\n",
+			"file": "module/simulation/CameraSimulator/src/BaseApplication.h",
+			"file_size": 3815,
+			"file_write_time": 130991133618088302,
+			"settings":
+			{
+				"buffer_size": 3701,
+				"line_ending": "Windows"
 			}
 		}
 	],
@@ -57,7 +217,7 @@
 		"selected_items":
 		[
 		],
-		"width": 392.0
+		"width": 404.0
 	},
 	"console":
 	{
@@ -77,10 +237,26 @@
 	},
 	"expanded_folders":
 	[
-		"/home/steve/NUSimulator"
+		"/home/steve/NUSimulator",
+		"/home/steve/NUSimulator/cmake",
+		"/home/steve/NUSimulator/module",
+		"/home/steve/NUSimulator/module/simulation",
+		"/home/steve/NUSimulator/module/simulation/CameraSimulator",
+		"/home/steve/NUSimulator/module/simulation/CameraSimulator/src",
+		"/home/steve/NUSimulator/roles"
 	],
 	"file_history":
 	[
+		"/home/steve/NUSimulator/cmake/Modules/FindOGRE.cmake",
+		"/home/steve/NUSimulator/cmake/Modules/FindPkgMacros.cmake",
+		"/home/steve/NUSimulator/cmake/Modules/PreprocessorUtils.cmake",
+		"/home/steve/NUSimulator/module/simulation/CameraSimulator/CMakeLists.txt",
+		"/home/steve/NUSimulator/shared/message/input/Image.cpp",
+		"/home/steve/NUSimulator/roles/CameraSimulator.role",
+		"/home/steve/NUSimulator/.gitignore",
+		"/home/steve/NUSimulator/module/simulation/CameraSimulator/src/CameraSimulator.h",
+		"/home/steve/NUSimulator/shared/message/input/Image.h",
+		"/home/steve/NUSimulator/nuclear/cmake/Modules/NUClearCompilerSettings.cmake",
 		"/home/steve/NUbots/module/audio/BeatnBeatDetector/src/BeatnBeatDetector.h",
 		"/home/steve/NUbots/module/debug/KinematicsDebug/src/KinematicsDebug.cpp",
 		"/home/steve/NUbots/build/shared/message/support/nuclear/proto/ReactionStatistics.pb.cc",
@@ -90,7 +266,7 @@
 	],
 	"find":
 	{
-		"height": 25.0
+		"height": 35.0
 	},
 	"find_in_files":
 	{
@@ -105,6 +281,20 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"data[",
+			"data",
+			"mSceneMgr",
+			"shadow",
+			"{\n",
+			"addTime",
+			"listen",
+			"addli",
+			"screen_w",
+			"window",
+			"vp",
+			"v",
+			"vp",
+			"-fPIC",
 			"ass Image",
 			"input::Image",
 			"Environment(",
@@ -128,6 +318,9 @@
 		"regex": false,
 		"replace_history":
 		[
+			"bitmap[",
+			"temp_image",
+			"scene_mgr"
 		],
 		"reverse": false,
 		"show_context": true,
@@ -138,7 +331,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 4,
 			"sheets":
 			[
 				{
@@ -154,8 +347,8 @@
 						"selection":
 						[
 							[
-								641,
-								641
+								0,
+								0
 							]
 						],
 						"settings":
@@ -166,36 +359,697 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 11,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "roles/CameraSimulator.role",
+					"file": "module/simulation/CameraSimulator/CMakeLists.txt",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 44,
+						"buffer_size": 256,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								44,
-								44
+								163,
+								163
 							]
 						],
 						"settings":
 						{
-							"auto_name": "NUCLEAR_ROLE(",
 							"syntax": "Packages/Text/Plain text.tmLanguage"
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "cmake/Modules/FindPkgMacros.cmake",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5638,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								5638,
+								5638
+							]
+						],
+						"settings":
+						{
+							"auto_name": "#-------------------------------------------------",
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2158.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "cmake/Modules/PreprocessorUtils.cmake",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1594,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1178,
+								1178
+							]
+						],
+						"settings":
+						{
+							"auto_name": "#-------------------------------------------------",
+							"syntax": "Packages/Text/Plain text.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 83.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "module/simulation/CameraSimulator/src/CameraSimulator.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 17909,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2006,
+								2006
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 614.0,
+						"zoom_level": 1.0
+					},
 					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "module/simulation/CameraSimulator/src/CameraSimulator (copy).cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5935,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								877,
+								877
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 65.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "module/simulation/CameraSimulator/src/CameraSimulator (copy).h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1948,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1698,
+								1698
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 174.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "module/simulation/CameraSimulator/src/BaseApplication.cpp",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 7781,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6595,
+								6595
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 2287.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 8,
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 17556,
+						"regions":
+						{
+							"match":
+							{
+								"flags": 112,
+								"regions":
+								[
+									[
+										314,
+										319
+									],
+									[
+										335,
+										340
+									],
+									[
+										711,
+										716
+									],
+									[
+										732,
+										737
+									],
+									[
+										1033,
+										1038
+									],
+									[
+										1054,
+										1059
+									],
+									[
+										1448,
+										1453
+									],
+									[
+										1469,
+										1474
+									],
+									[
+										1754,
+										1759
+									],
+									[
+										1775,
+										1780
+									],
+									[
+										2151,
+										2156
+									],
+									[
+										2172,
+										2177
+									],
+									[
+										2521,
+										2526
+									],
+									[
+										2542,
+										2547
+									],
+									[
+										3313,
+										3318
+									],
+									[
+										3334,
+										3339
+									],
+									[
+										3835,
+										3840
+									],
+									[
+										3856,
+										3861
+									],
+									[
+										3862,
+										3867
+									],
+									[
+										4716,
+										4721
+									],
+									[
+										4737,
+										4742
+									],
+									[
+										5098,
+										5103
+									],
+									[
+										5438,
+										5443
+									],
+									[
+										5929,
+										5934
+									],
+									[
+										5950,
+										5955
+									],
+									[
+										6338,
+										6343
+									],
+									[
+										6359,
+										6364
+									],
+									[
+										6663,
+										6668
+									],
+									[
+										6684,
+										6689
+									],
+									[
+										7090,
+										7095
+									],
+									[
+										7111,
+										7116
+									],
+									[
+										7399,
+										7404
+									],
+									[
+										7420,
+										7425
+									],
+									[
+										7808,
+										7813
+									],
+									[
+										7829,
+										7834
+									],
+									[
+										8178,
+										8183
+									],
+									[
+										8199,
+										8204
+									],
+									[
+										8985,
+										8990
+									],
+									[
+										9006,
+										9011
+									],
+									[
+										9514,
+										9519
+									],
+									[
+										9535,
+										9540
+									],
+									[
+										9541,
+										9546
+									],
+									[
+										10410,
+										10415
+									],
+									[
+										10431,
+										10436
+									],
+									[
+										10798,
+										10803
+									],
+									[
+										11138,
+										11143
+									],
+									[
+										11583,
+										11588
+									],
+									[
+										11604,
+										11609
+									],
+									[
+										11905,
+										11910
+									],
+									[
+										11926,
+										11931
+									],
+									[
+										12263,
+										12268
+									],
+									[
+										12284,
+										12289
+									],
+									[
+										12290,
+										12295
+									],
+									[
+										12744,
+										12749
+									],
+									[
+										12763,
+										12768
+									],
+									[
+										12784,
+										12789
+									],
+									[
+										13319,
+										13324
+									],
+									[
+										13340,
+										13345
+									],
+									[
+										13735,
+										13740
+									],
+									[
+										13756,
+										13761
+									],
+									[
+										14241,
+										14246
+									],
+									[
+										14262,
+										14267
+									],
+									[
+										14577,
+										14582
+									],
+									[
+										14692,
+										14697
+									],
+									[
+										14762,
+										14767
+									],
+									[
+										14960,
+										14965
+									],
+									[
+										14981,
+										14986
+									],
+									[
+										15237,
+										15242
+									],
+									[
+										15258,
+										15263
+									],
+									[
+										15550,
+										15555
+									],
+									[
+										15571,
+										15576
+									],
+									[
+										15577,
+										15582
+									],
+									[
+										15980,
+										15985
+									],
+									[
+										15999,
+										16004
+									],
+									[
+										16020,
+										16025
+									],
+									[
+										16549,
+										16554
+									],
+									[
+										16570,
+										16575
+									],
+									[
+										16914,
+										16919
+									],
+									[
+										16935,
+										16940
+									],
+									[
+										17414,
+										17419
+									],
+									[
+										17435,
+										17440
+									]
+								],
+								"scope": ""
+							}
+						},
+						"selection":
+						[
+							[
+								14621,
+								14621
+							]
+						],
+						"settings":
+						{
+							"detect_indentation": false,
+							"line_numbers": false,
+							"output_tag": 1,
+							"result_base_dir": "",
+							"result_file_regex": "^([A-Za-z\\\\/<].*):$",
+							"result_line_regex": "^ +([0-9]+):",
+							"scroll_past_end": true,
+							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 3672.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
+					"type": "text"
+				},
+				{
+					"buffer": 9,
+					"file": "nuclear/cmake/Modules/NUClearCompilerSettings.cmake",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1776,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1488,
+								1488
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 10,
+					"file": "module/simulation/CameraSimulator/src/CameraSimulator.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2703,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								2395,
+								2395
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 922.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "module/simulation/CameraSimulator/src/CameraSimulator.cpp~",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 1065,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "module/simulation/CameraSimulator/src/BaseApplication.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 3701,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1128,
+								1128
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1216.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 7,
 					"type": "text"
 				}
 			]
@@ -244,7 +1098,7 @@
 	"project": "nusimulator.sublime-project",
 	"replace":
 	{
-		"height": 46.0
+		"height": 64.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -282,7 +1136,7 @@
 	"show_open_files": false,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 437.0,
+	"side_bar_width": 379.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

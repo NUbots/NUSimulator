@@ -14,6 +14,8 @@ SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 # We use additional modules that cmake needs to know about
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
+INCLUDE(SharedLibraries)
+
 # Initialise NUClear
 ADD_SUBDIRECTORY(nuclear)
 
